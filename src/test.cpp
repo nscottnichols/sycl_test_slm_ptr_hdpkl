@@ -81,9 +81,10 @@ int main(int argc, char **argv) {
     q.memcpy(_usm, h_a, sizeof(double)*SLM_SIZE);
     q.wait();
 
+    size_t grid_size = (genome_size + WORK_GROUP_SIZE - 1)/WORK_GROUP_SIZE;
     q.submit([&](sycl::handler& cgh) {
         cgh.parallel_for_work_group(sycl::range<1>{grid_size}, sycl::range<1>{WORK_GROUP_SIZE}, ([=](sycl::group<1> work_group) {
-            auto _slm = usm_ptr;
+            auto _slm = _usm;
             work_group.parallel_for_work_item([&](sycl::h_item<1> it) {
                 size_t global_idx = it.get_global_id(0);
                 if (global_idx < N) {
@@ -111,7 +112,7 @@ int main(int argc, char **argv) {
 
                 //mess with data in slm
                 if (local_idx == 0) {
-                    _slm[0] = 99999999.99999999
+                    _slm[0] = 99999999.99999999;
                 }
             });
 
