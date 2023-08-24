@@ -66,8 +66,8 @@ int main(int argc, char **argv) {
     //}
 
     //test unconventional slm
-    auto h_a  = (double*) malloc(sizeof(double)*N); 
-    auto h_c  = (double*) malloc(sizeof(double)*L); 
+    auto h_a  = (double*) malloc(sizeof(double)*SLM_SIZE); 
+    auto h_c  = (double*) malloc(sizeof(double)*N); 
 
     //set host arrays
     for (size_t i=0; i<SLM_SIZE; i++) {
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     q.memcpy(_usm, h_a, sizeof(double)*SLM_SIZE);
     q.wait();
 
-    size_t grid_size = (genome_size + WORK_GROUP_SIZE - 1)/WORK_GROUP_SIZE;
+    size_t grid_size = (N + WORK_GROUP_SIZE - 1)/WORK_GROUP_SIZE;
     q.submit([&](sycl::handler& cgh) {
         cgh.parallel_for_work_group(sycl::range<1>{grid_size}, sycl::range<1>{WORK_GROUP_SIZE}, ([=](sycl::group<1> work_group) {
             auto _slm = _usm;
